@@ -85,7 +85,7 @@ module.exports = {
     getIPRecordsByDomainPromise: function (domain, count) {
         if (count) {
             return allIPsModel.find({
-                'domains': domain,
+                'domains': mongoSanitize.sanitize({ data: domain }).data,
             }).countDocuments().exec();
         } else {
             return allIPsModel.find({
