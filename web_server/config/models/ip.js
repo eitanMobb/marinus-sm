@@ -122,7 +122,7 @@ module.exports = {
     getIPRecordsByIPVersionPromise: function (version, count, limit, page) {
         if (count) {
             return allIPsModel.find({
-                'version': version,
+                'version': mongoSanitize.sanitize({ data: version }).data,
             }).countDocuments().exec();
         } else if (limit !== undefined && limit > 0) {
             return allIPsModel.find({
