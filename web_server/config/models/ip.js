@@ -74,7 +74,7 @@ module.exports = {
     getIPRecordsByZonePromise: function (zone, count) {
         if (count) {
             return allIPsModel.find({
-                'zones': zone,
+                'zones': mongoSanitize.sanitize({ data: zone }).data,
             }).countDocuments().exec();
         } else {
             return allIPsModel.find({
