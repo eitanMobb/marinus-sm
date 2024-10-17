@@ -9,8 +9,9 @@
 name: "Snyk/Mobb with Auto-PR"
 
 on:
-  push:
-    branches: ["*"]
+  pull_request_target:
+    branches:
+      - 'main'
 
 jobs:
   scan-and-fix:
