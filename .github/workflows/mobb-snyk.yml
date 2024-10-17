@@ -9,7 +9,7 @@
 name: "Mobb/Snyk"
 
 on:
-  push:
+  pull_request:
     branches: ["*"]
 
 jobs:
