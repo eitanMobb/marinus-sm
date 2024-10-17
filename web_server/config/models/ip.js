@@ -111,7 +111,7 @@ module.exports = {
     getIPRecordsByHostCIDRPromise: function (cidr, count) {
         if (count) {
             return allIPsModel.find({
-                'host.host_cidr': cidr,
+                'host.host_cidr': mongoSanitize.sanitize({ data: cidr }).data,
             }).countDocuments().exec();
         } else {
             return allIPsModel.find({
