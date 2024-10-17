@@ -96,7 +96,7 @@ module.exports = {
     getIPRecordsByHostPartnerPromise: function (partner, count, limit, page) {
         if (count) {
             return allIPsModel.find({
-                'host.hosting_partner': partner,
+                'host.hosting_partner': mongoSanitize.sanitize({ data: partner }).data,
             }).countDocuments().exec();
         } else if (limit !== undefined && limit > 0) {
             return allIPsModel.find({
