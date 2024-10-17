@@ -15,7 +15,7 @@ on:
 
 jobs:
   scan-and-fix:
-    name: Scan with Snyk and fix with Mobb Auto-PR
+    name: Scan with Snyk and fix with Mobb to create base scan
     runs-on: 'ubuntu-latest'
     timeout-minutes: 360
     permissions:
