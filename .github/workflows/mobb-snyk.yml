@@ -6,7 +6,7 @@
 # MOBB_API_TOKEN - your mobb user credentials (autumatially set if you forked this repo via the Mobb app)
 # GITHUB_TOKEN - automatically set by GitHub
 
-name: "Mobb/Snyk"
+name: "Snyk/Mobb with Auto-PR"
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   scan-and-fix:
-    name: Scan with Snyk and fix with Mobb
+    name: Scan with Snyk and fix with Mobb Auto-PR
     runs-on: 'ubuntu-latest'
     timeout-minutes: 360
     permissions:
