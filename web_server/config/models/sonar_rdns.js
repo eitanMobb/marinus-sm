@@ -12,6 +12,7 @@
  * governing permissions and limitations under the License.
  */
 
+const mongoSanitize = require('express-mongo-sanitize');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -52,7 +53,7 @@ module.exports = {
     },
     getSRDNSByDomainPromise: function (domain) {
         return rdnsModel.find({
-            'fqdn': domain,
+            'fqdn': mongoSanitize.sanitize({ data: domain }).data,
         }).exec();
     },
     getSRDNSCount: function (zone) {
