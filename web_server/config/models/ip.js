@@ -52,4 +52,88 @@ module.exports = {
             'ip': ip,
         }).exec();
     },
+    getAllTrackedIPRecordsPromise: function (count, limit, page) {
+        if (count) {
+            return allIPsModel.find({ 'host.hosting_partner': "TRACKED" }).countDocuments().exec();
+        } else if (limit !== undefined && limit > 0) {
+            return allIPsModel.find({ 'host.hosting_partner': "TRACKED" }).skip(limit * (page - 1)).limit(limit).exec();
+        } else {
+            return allIPsModel.find({ 'host.hosting_partner': "TRACKED" }).exec();
+        }
+    },
+    getAllManagedIPRecordsPromise: function (count, limit, page) {
+        if (count) {
+            return allIPsModel.find({ "$or": [{ 'host.hosting_partner': "TRACKED" }, { 'host.splunk': { "$exists": true } }] }).countDocuments().exec();
+        } else if (limit !== undefined && limit > 0) {
+            return allIPsModel.find({ "$or": [{ 'host.hosting_partner': "TRACKED" }, { 'host.splunk': { "$exists": true } }] }).skip(limit * (page - 1)).limit(limit).exec();
+        } else {
+            return allIPsModel.find({ "$or": [{ 'host.hosting_partner': "TRACKED" }, { 'host.splunk': { "$exists": true } }] }).exec();
+        }
+    },
+    getIPRecordsByZonePromise: function (zone, count) {
+        if (count) {
+            return allIPsModel.find({
+                'zones': zone,
+            }).countDocuments().exec();
+        } else {
+            return allIPsModel.find({
+                'zones': zone,
+            }).exec();
+        }
+    },
+    getIPRecordsByDomainPromise: function (domain, count) {
+        if (count) {
+            return allIPsModel.find({
+                'domains': domain,
+            }).countDocuments().exec();
+        } else {
+            return allIPsModel.find({
+                'domains': domain,
+            }).exec();
+        }
+    },
+    getIPRecordsByHostPartnerPromise: function (partner, count, limit, page) {
+        if (count) {
+            return allIPsModel.find({
+                'host.hosting_partner': partner,
+            }).countDocuments().exec();
+        } else if (limit !== undefined && limit > 0) {
+            return allIPsModel.find({
+                'host.hosting_partner': partner,
+            }).skip(limit * (page - 1)).limit(limit).exec();
+        } else {
+            return allIPsModel.find({
+                'host.hosting_partner': partner,
+            }).exec();
+        }
+    },
+    getIPRecordsByHostCIDRPromise: function (cidr, count) {
+        if (count) {
+            return allIPsModel.find({
+                'host.host_cidr': cidr,
+            }).countDocuments().exec();
+        } else {
+            return allIPsModel.find({
+                'host.host_cidr': cidr,
+            }).exec();
+        }
+    },
+    getIPRecordsByIPVersionPromise: function (version, count, limit, page) {
+        if (count) {
+            return allIPsModel.find({
+                'version': version,
+            }).countDocuments().exec();
+        } else if (limit !== undefined && limit > 0) {
+            return allIPsModel.find({
+                'version': version,
+            }).skip(limit * (page - 1)).limit(limit).exec();
+        } else {
+            return allIPsModel.find({
+                'version': version,
+            }).exec();
+        }
+    },
+    getAllIPRecordsCountPromise: function () {
+        return allIPsModel.find({}).countDocuments().exec();
+    },
 }
