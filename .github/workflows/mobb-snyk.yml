@@ -9,7 +9,7 @@
 name: "Mobb/Snyk"
 
 on:
-  pull_request:
+  push:
     branches: ["*"]
 
 jobs:
@@ -39,9 +39,11 @@ jobs:
 
       - name: Run Mobb on the findings and get fixes
         if: always()
-        uses: mobb-dev/action/review@v1.1
+        uses: mobb-dev/action/review@support-for-mobb-project-name
         with:
           report-file: "/home/runner/report.json"
           api-key: ${{ secrets.MOBB_API_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          mobb-project-name: "auto-pr-demo"
+          auto-pr: true
           scanner: snyk
