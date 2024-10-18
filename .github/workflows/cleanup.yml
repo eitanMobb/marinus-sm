@@ -11,6 +11,9 @@ jobs:
       statuses: write
       contents: write
       actions: read
+    env:
+      MOBB_API_TOKEN: ${{ secrets.MOBB_API_TOKEN }}
+      PROJECT_ID: "5ef62826-8871-4671-b51f-68940fe66c49"  # Set your Project ID here
 
     steps:
       - name: Checkout repository
@@ -33,3 +36,49 @@ jobs:
             echo "Deleting branch: $branch"
             git push origin --delete "$branch"
           done
+
+      - name: List all projects and fetch vulnerability reports
+        id: list-reports
+        run: |
+          # Define the GraphQL query to list projects
+          LIST_PROJECT_QUERY='{"query":"query GetProject($projectId: uuid!) { project_by_pk(id: $projectId) { name id isDefault organizationId vulnerabilityReports: lastAnalysedVulReports(where: {fixReport: {state: {_in: [Finished, Initialized, Expired]}, repoArchiveId: {_is_null: false}}}) { vendor name id fixReport { id fixesDoneCount fixesInprogressCount fixesReadyCount issueLanguages issueTypes fixesCountByEffort vulnerabilitySeverities fixes_aggregate { aggregate { count } } repo { originalUrl reference name } createdOn expirationOn createdByUser { email } state } } } }","variables":{"projectId":"'$PROJECT_ID'"},"operationName":"GetProject"}'
+
+          # Execute the query to get all projects
+          RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" -H "x-mobb-key: $MOBB_API_TOKEN" -d "$LIST_PROJECT_QUERY" https://api.mobb.ai/v1/graphql)
+
+          # Parse the vulnerability reports from the response
+          echo "Vulnerability Reports:"
+          echo $RESPONSE | jq '.data.project_by_pk.vulnerabilityReports' > reports.json
+
+          # Store the reports in the GitHub output for later steps
+          echo "::set-output name=reports::$(cat reports.json)"
+
+      - name: Delete each vulnerability report
+        run: |
+          # Read the reports from the previous step
+          REPORTS=$(cat reports.json)
+          
+          # Iterate through each report
+          echo $REPORTS | jq -c '.[]' | while read report; do
+            VENDOR=$(echo $report | jq -r '.vendor')
+            ORIGINAL_URL=$(echo $report | jq -r '.fixReport.repo.originalUrl')
+            REFERENCE=$(echo $report | jq -r '.fixReport.repo.reference')
+
+            # Define the GraphQL mutation to delete the vulnerability report
+            DELETE_REPORT_MUTATION=$(jq -n --arg vendor "$VENDOR" --arg originalUrl "$ORIGINAL_URL" --arg reference "$REFERENCE" --arg projectId "$PROJECT_ID" \
+            '{"query":"mutation MakeVulnerabilityReportDeleted($vendor: vulnerability_report_vendor_enum, $originalUrl: String!, $reference: String!, $projectId: uuid!) { update_vulnerability_report(where: {vendor: {_eq: $vendor}, projectId: {_eq: $projectId}, fixReport: {repo: {originalUrl: {_eq: $originalUrl}, reference: {_eq: $reference}}}}, _set: {isDeleted: true}) { affected_rows }}","variables":{"vendor":$vendor,"originalUrl":$originalUrl,"reference":$reference,"projectId":$projectId},"operationName":"MakeVulnerabilityReportDeleted"}')
+
+            # Execute the mutation to delete the report
+            curl -s -X POST -H "Content-Type: application/json" -H "x-mobb-key: $MOBB_API_TOKEN" -d "$DELETE_REPORT_MUTATION" https://api.mobb.ai/v1/graphql
+          done
+
+      - name: Verify deletion by listing projects again
+        run: |
+          # Execute the same query to ensure there are no more reports left
+          LIST_PROJECT_QUERY='{"query":"query GetProject($projectId: uuid!) { project_by_pk(id: $projectId) { name id isDefault organizationId vulnerabilityReports: lastAnalysedVulReports(where: {fixReport: {state: {_in: [Finished, Initialized, Expired]}, repoArchiveId: {_is_null: false}}}) { vendor name id fixReport { id fixesDoneCount fixesInprogressCount fixesReadyCount issueLanguages issueTypes fixesCountByEffort vulnerabilitySeverities fixes_aggregate { aggregate { count } } repo { originalUrl reference name } createdOn expirationOn createdByUser { email } state } } } }","variables":{"projectId":"'$PROJECT_ID'"},"operationName":"GetProject"}'
+          
+          RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" -H "x-mobb-key: $MOBB_API_TOKEN" -d "$LIST_PROJECT_QUERY" https://api.mobb.ai/v1/graphql)
+          
+          # Print the results to verify deletion
+          echo "Updated Vulnerability Reports:"
+          echo $RESPONSE | jq '.data.project_by_pk.vulnerabilityReports'
