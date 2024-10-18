@@ -1,4 +1,4 @@
-name: Delete Branches
+name: Delete Branches and clean up Mobb project folder
 
 on:
   workflow_dispatch:
