@@ -12,6 +12,9 @@ on:
   pull_request_target:
     branches:
       - 'dev'
+    paths:
+      - '**\tpds.js'
+
 
 jobs:
   scan-and-fix:
