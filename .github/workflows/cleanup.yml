@@ -1,0 +1,29 @@
+name: Delete Branches
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensure all branches are fetched
+
+      - name: List all branches
+        run: |
+          git branch -r
+
+      - name: Delete branches except 'main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          protected_branch="main"
+          branches=$(git branch -r | grep -v "$protected_branch" | grep -v "/HEAD" | sed 's/origin\///')
+          
+          for branch in $branches; do
+            echo "Deleting branch: $branch"
+            git push origin --delete "$branch"
+          done
