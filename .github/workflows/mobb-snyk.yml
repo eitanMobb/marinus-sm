@@ -9,9 +9,6 @@
 name: "Snyk/Mobb with Auto-PR"
 
 on:
-  push:
-    branches:
-      - 'dev'
   pull_request_target:
     branches:
       - 'dev'
