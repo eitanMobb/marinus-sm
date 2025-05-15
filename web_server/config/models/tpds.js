@@ -50,7 +50,7 @@ module.exports = {
     },
     getTPDsByWildcard: function (search, listOnly) {
         let promise;
-        let AWSregex = new RegExp('.*' + escapeRegExp(search) + '$');
+        let AWSregex = new RegExp('.*' + escapeRegExp(escapeRegExp(search)) + '$');
         if (listOnly) {
             promise = tpdModel.find({
                 'tld': { '$regex': AWSregex },
