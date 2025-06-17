@@ -53,5 +53,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           mobb-project-name: "auto-pr-GH"
           auto-pr: true
-          commit-directly: true
 
