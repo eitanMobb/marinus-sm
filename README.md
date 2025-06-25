@@ -14,7 +14,7 @@ This repository stores four folders relevant to Marinus:
   * *web_server*: The Node.js web server which provides the GUI and the REST APIs.
   * *cron_scripts*: A small collection of Python 2.x scripts which still require legacy libraries.
   * *python3_cron_scripts*: The Python 3.x scripts which retrieve and parse the majority of data.
-  * *nginx_proxy*: The nginx configuration for the optional reverse proxy in front of the Node.js server.
+  * *nginx_proxy*: The nginx configuration for the optional reverse proxy in front of the Node.js server.fdfdedd
 
 ## The cron scripts
 The Python 2.x and Python 3.x scripts are responsible for talking to various third-party services and extracting out the relavent data. They can be automated to run on a regular basis using the Unix cron daemon or a similar scheduler. The python3_cron_scripts folder contains the Marinus setup script and the majority of the scripts for collecting Marinus information. The cron_scripts folder contains a small number of Python 2.x scripts that are still dependent on Python 2.x libraries.
